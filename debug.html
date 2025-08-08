@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Debug Page</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .debug-section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status-good { color: #10b981; }
+        .status-bad { color: #ef4444; }
+        .status-warn { color: #f59e0b; }
+        button { padding: 10px 20px; margin: 5px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #3949ab; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .article-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: white; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        #console { background: #1a1a1a; color: #00ff00; padding: 15px; border-radius: 5px; font-family: monospace; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+        .blog-meta { font-size: 0.9em; color: #666; margin: 10px 0; }
+        .tag { background: #1a237e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; }
+        .navigation-test { margin: 10px 0; }
+        .navigation-test a { display: inline-block; margin: 5px; padding: 10px 15px; background: #e5e7eb; color: #374151; text-decoration: none; border-radius: 5px; }
+        .navigation-test a:hover { background: #d1d5db; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Portfolio Debug & Test Page</h1>
+        
+        <div class="debug-section">
+            <h2>Environment Info</h2>
+            <div id="env-info">
+                <p><strong>URL:</strong> <span id="current-url"></span></p>
+                <p><strong>Protocol:</strong> <span id="protocol"></span></p>
+                <p><strong>Hostname:</strong> <span id="hostname"></span></p>
+                <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+            </div>
+        </div>
+
+        <div class="debug-section">
+            <h2>Navigation Test</h2>
+            <p>Test if blog navigation works:</p>
+            <div class="navigation-test">
+                <a href="index.html">← Back to Home</a>
+                <a href="blog.html">Go to Blog Page →</a>
+                <a href="#test-section">Hash Link Test</a>
+            </div>
+            <p id="nav-status">Click links above to test navigation...</p>
+        </div>
+
+        <div class="debug-section">
+            <h2>JavaScript Status</h2>
+            <div id="js-status">
+                <p>⏳ Checking JavaScript functionality...</p>
+            </div>
+            <button onclick="runJSTests()">Run JavaScript Tests</button>
+        </div>
+
+        <div class="debug-section">
+            <h2>Article Rendering Test</h2>
+            <button onclick="testArticleRendering()">Test Article Cards</button>
+            <div id="articles-test" class="test-grid"></div>
+        </div>
+
+        <div class="debug-section">
+            <h2>Console Output</h2>
+            <button onclick="clearConsole()">Clear Console</button>
+            <div id="console"></div>
+        </div>
+
+        <div id="test-section" class="debug-section">
+            <h2>Hash Navigation Test</h2>
+            <p>If you can see this section after clicking the hash link, navigation is working!</p>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for testing (self-contained)
+        const SAMPLE_ARTICLES = [
+            {
+                id: 1,
+                title: "Spring Boot Performance Optimization",
+                slug: "spring-boot-optimization",
+                excerpt: "Learn advanced techniques for optimizing Spring Boot applications in production environments.",
+                content: "# Spring Boot Performance\n\nThis is a comprehensive guide to optimizing Spring Boot applications...",
+                publishedAt: "2024-03-15T10:00:00.000Z",
+                featured: true,
+                tags: ["Java", "Spring Boot", "Performance"],
+                author: "Senior Java Engineer",
+                readTime: 5,
+                image: "images/blog/spring-boot-placeholder.jpg"
+            },
+            {
+                id: 2,
+                title: "DevOps Pipeline Automation",
+                slug: "devops-automation",
+                excerpt: "Building robust CI/CD pipelines for microservices architecture.",
+                content: "# DevOps Automation\n\nModern DevOps practices require...",
+                publishedAt: "2024-02-20T10:00:00.000Z",
+                featured: false,
+                tags: ["DevOps", "CI/CD", "Automation"],
+                author: "Senior Java Engineer",
+                readTime: 7,
+                image: "images/blog/devops-placeholder.jpg"
+            }
+        ];
+
+        // Console capture
+        const consoleDiv = document.getElementById('console');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '[ERROR]' : type === 'warn' ? '[WARN]' : '[INFO]';
+            const color = type === 'error' ? '#ff6b6b' : type === 'warn' ? '#feca57' : '#00ff00';
+            
+            consoleDiv.innerHTML += `<span style="color: ${color}">[${timestamp}] ${prefix} ${message}</span>\n`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+
+        function clearConsole() {
+            consoleDiv.innerHTML = '';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Debug page loaded successfully');
+            
+            // Fill environment info
+            document.getElementById('current-url').textContent = window.location.href;
+            document.getElementById('protocol').textContent = window.location.protocol;
+            document.getElementById('hostname').textContent = window.location.hostname;
+            document.getElementById('user-agent').textContent = navigator.userAgent.substring(0, 100) + '...';
+            
+            // Initial tests
+            runJSTests();
+        });
+
+        function runJSTests() {
+            console.log('🧪 Running JavaScript tests...');
+            
+            const statusDiv = document.getElementById('js-status');
+            let results = [];
+            
+            // Test 1: Basic JavaScript
+            try {
+                const test = [1, 2, 3].map(x => x * 2);
+                results.push(`<p class="status-good">✅ Basic JavaScript: Working</p>`);
+                console.log('✅ Basic JavaScript test passed');
+            } catch (e) {
+                results.push(`<p class="status-bad">❌ Basic JavaScript: Failed - ${e.message}</p>`);
+                console.error('❌ Basic JavaScript test failed:', e);
+            }
+
+            // Test 2: DOM Manipulation
+            try {
+                const testDiv = document.createElement('div');
+                testDiv.textContent = 'Test';
+                results.push(`<p class="status-good">✅ DOM Manipulation: Working</p>`);
+                console.log('✅ DOM manipulation test passed');
+            } catch (e) {
+                results.push(`<p class="status-bad">❌ DOM Manipulation: Failed - ${e.message}</p>`);
+                console.error('❌ DOM manipulation test failed:', e);
+            }
+
+            // Test 3: Async/Await
+            (async function() {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    results.push(`<p class="status-good">✅ Async/Await: Working</p>`);
+                    console.log('✅ Async/Await test passed');
+                } catch (e) {
+                    results.push(`<p class="status-bad">❌ Async/Await: Failed - ${e.message}</p>`);
+                    console.error('❌ Async/Await test failed:', e);
+                }
+                
+                // Test 4: Check for external dependencies
+                if (typeof StrapiAPI !== 'undefined') {
+                    results.push(`<p class="status-good">✅ StrapiAPI: Loaded</p>`);
+                    console.log('✅ StrapiAPI class found');
+                } else {
+                    results.push(`<p class="status-warn">⚠️ StrapiAPI: Not loaded (expected for debug page)</p>`);
+                    console.warn('⚠️ StrapiAPI class not found');
+                }
+
+                // Test 5: Sample article processing
+                try {
+                    const processedArticle = formatSampleArticle(SAMPLE_ARTICLES[0]);
+                    results.push(`<p class="status-good">✅ Article Processing: Working</p>`);
+                    console.log('✅ Article processing test passed');
+                } catch (e) {
+                    results.push(`<p class="status-bad">❌ Article Processing: Failed - ${e.message}</p>`);
+                    console.error('❌ Article processing test failed:', e);
+                }
+                
+                statusDiv.innerHTML = results.join('');
+            })();
+        }
+
+        function formatSampleArticle(article) {
+            return {
+                ...article,
+                formattedDate: new Date(article.publishedAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }),
+                readTimeText: `${article.readTime} min read`
+            };
+        }
+
+        function generateArticleCard(article) {
+            const formatted = formatSampleArticle(article);
+            return `
+                <div class="article-card">
+                    <h3>${formatted.title}</h3>
+                    <div class="blog-meta">
+                        <span>📅 ${formatted.formattedDate}</span>
+                        <span>⏱️ ${formatted.readTimeText}</span>
+                        <span>👤 ${formatted.author}</span>
+                    </div>
+                    <p>${formatted.excerpt}</p>
+                    <div class="blog-tags">
+                        ${formatted.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <p><strong>Status:</strong> ${formatted.featured ? 'Featured' : 'Regular'} Article</p>
+                </div>
+            `;
+        }
+
+        function testArticleRendering() {
+            console.log('🎨 Testing article rendering...');
+            
+            const container = document.getElementById('articles-test');
+            container.innerHTML = '<div class="loading">🔄 Rendering articles...</div>';
+            
+            setTimeout(() => {
+                try {
+                    const articlesHTML = SAMPLE_ARTICLES.map(article => generateArticleCard(article)).join('');
+                    container.innerHTML = articlesHTML;
+                    console.log('✅ Article rendering successful');
+                } catch (error) {
+                    container.innerHTML = `<div class="status-bad">❌ Rendering failed: ${error.message}</div>`;
+                    console.error('❌ Article rendering failed:', error);
+                }
+            }, 500);
+        }
+
+        // Navigation tracking
+        let navigationAttempts = 0;
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A') {
+                navigationAttempts++;
+                const href = e.target.getAttribute('href');
+                console.log(`🔗 Navigation attempt #${navigationAttempts}: ${href}`);
+                
+                if (href.startsWith('#')) {
+                    document.getElementById('nav-status').innerHTML = 
+                        `<span class="status-good">✅ Hash navigation to ${href} detected</span>`;
+                } else {
+                    document.getElementById('nav-status').innerHTML = 
+                        `<span class="status-warn">⏳ Attempting page navigation to ${href}...</span>`;
+                }
+            }
+        });
+
+        // URL change detection
+        let currentURL = window.location.href;
+        setInterval(() => {
+            if (window.location.href !== currentURL) {
+                currentURL = window.location.href;
+                console.log('🔄 URL changed to:', currentURL);
+                document.getElementById('current-url').textContent = currentURL;
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

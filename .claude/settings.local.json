@@ -3,7 +3,9 @@
     "allow": [
       "Bash(mkdir:*)",
       "WebFetch(domain:doguskaplan97.github.io)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

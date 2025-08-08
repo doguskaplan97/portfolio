@@ -437,10 +437,19 @@ class ArticleRouter {
 
 // Configuration and initialization
 const CMS_CONFIG = {
-    // Default to localhost for development, change this to your deployed Strapi URL
-    strapiURL: window.location.hostname === 'localhost' 
-        ? 'http://localhost:1337' 
-        : 'https://your-strapi-instance.railway.app',
+    // Environment-based Strapi URL configuration
+    strapiURL: (() => {
+        const hostname = window.location.hostname;
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            return 'http://localhost:1337';
+        } else if (hostname.includes('github.io')) {
+            // For GitHub Pages, we'll use fallback articles since no Strapi is deployed
+            return 'https://api-unavailable-using-fallback.local';
+        } else {
+            // For other production environments
+            return 'https://your-strapi-instance.railway.app';
+        }
+    })(),
     
     // Fallback articles for development/offline mode
     fallbackArticles: [

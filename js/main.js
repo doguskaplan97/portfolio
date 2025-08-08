@@ -1,5 +1,62 @@
+// Global error handler
+window.addEventListener('error', function(e) {
+    console.error('❌ Global JavaScript Error:', e.message, 'at', e.filename, ':', e.lineno);
+    showErrorNotification('A JavaScript error occurred. Check the console for details.');
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('❌ Unhandled Promise Rejection:', e.reason);
+    showErrorNotification('An asynchronous error occurred. Check the console for details.');
+});
+
+// Global error notification function
+function showErrorNotification(message, details = '') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ef4444;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 10001;
+        max-width: 400px;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+            <span>⚠️</span>
+            <div>
+                <strong>Error:</strong> ${message}
+                ${details ? `<br><small>${details}</small>` : ''}
+                <div style="margin-top: 0.5rem;">
+                    <button onclick="this.closest('div').parentElement.parentElement.remove()" 
+                            style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 10000);
+}
+
 // Main JavaScript functionality for the portfolio website
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Portfolio website initializing...');
     
     // Initialize all features
     initNavigation();
@@ -479,37 +536,62 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // CMS Integration
     function initCMS() {
-        console.log('🚀 Initializing CMS integration...');
-        
-        // Check if CMS classes are available
-        if (typeof StrapiAPI === 'undefined') {
-            console.error('❌ StrapiAPI class not found - make sure cms-api.js is loaded');
-            return;
-        }
-        
-        // Initialize Strapi API and Article Manager
-        strapiAPI = new StrapiAPI(CMS_CONFIG.strapiURL);
-        articleManager = new ArticleManager(strapiAPI);
-        articleRouter = new ArticleRouter(articleManager);
-        
-        console.log('✅ CMS classes initialized');
-        console.log('📡 Strapi URL:', CMS_CONFIG.strapiURL);
-        console.log('📝 Fallback articles available:', CMS_CONFIG.fallbackArticles.length);
-        
-        // Load featured articles for homepage blog section
-        const blogGrid = document.querySelector('#homepage-blog-grid');
-        if (blogGrid) {
-            console.log('🎯 Found blog grid, loading articles...');
-            loadFeaturedArticles(blogGrid);
-        } else {
-            console.warn('⚠️ Blog grid element not found');
-        }
-        
-        // Add search functionality if search input exists
-        const searchInput = document.querySelector('#article-search');
-        if (searchInput) {
-            console.log('🔍 Search input found, initializing search...');
-            initArticleSearch(searchInput);
+        try {
+            console.log('🚀 Initializing CMS integration...');
+            
+            // Check if CMS classes are available
+            if (typeof StrapiAPI === 'undefined') {
+                throw new Error('StrapiAPI class not found - make sure cms-api.js is loaded');
+            }
+            
+            if (typeof CMS_CONFIG === 'undefined') {
+                throw new Error('CMS_CONFIG not found - make sure cms-api.js is loaded');
+            }
+            
+            // Initialize Strapi API and Article Manager
+            strapiAPI = new StrapiAPI(CMS_CONFIG.strapiURL);
+            articleManager = new ArticleManager(strapiAPI);
+            articleRouter = new ArticleRouter(articleManager);
+            
+            console.log('✅ CMS classes initialized');
+            console.log('📡 Strapi URL:', CMS_CONFIG.strapiURL);
+            console.log('📝 Fallback articles available:', CMS_CONFIG.fallbackArticles?.length || 0);
+            
+            // Load featured articles for homepage blog section
+            const blogGrid = document.querySelector('#homepage-blog-grid');
+            if (blogGrid) {
+                console.log('🎯 Found blog grid, loading articles...');
+                loadFeaturedArticles(blogGrid).catch(error => {
+                    console.error('❌ Failed to load articles:', error);
+                    showErrorNotification('Failed to load articles', error.message);
+                });
+            } else {
+                console.warn('⚠️ Blog grid element not found - this is normal if not on homepage');
+            }
+            
+            // Add search functionality if search input exists
+            const searchInput = document.querySelector('#article-search');
+            if (searchInput) {
+                console.log('🔍 Search input found, initializing search...');
+                initArticleSearch(searchInput);
+            }
+            
+        } catch (error) {
+            console.error('❌ CMS initialization failed:', error);
+            showErrorNotification('CMS initialization failed', error.message);
+            
+            // Fallback: try to show fallback articles if possible
+            const blogGrid = document.querySelector('#homepage-blog-grid');
+            if (blogGrid && typeof CMS_CONFIG !== 'undefined' && CMS_CONFIG.fallbackArticles) {
+                console.log('🔄 Using emergency fallback articles...');
+                blogGrid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>CMS Unavailable</h3>
+                        <p>Using offline content. Some features may be limited.</p>
+                    </div>
+                `;
+            }
         }
     }
     
