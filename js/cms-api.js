@@ -185,8 +185,12 @@ class ArticleManager {
     
     // Render articles to container
     async renderArticles(container, articles = null) {
+        console.log('🎨 ArticleManager.renderArticles called');
+        console.log('📦 Container:', container);
+        console.log('📰 Articles provided:', articles ? articles.length : 'null (will fetch)');
+        
         if (!container) {
-            console.error('Container element not found');
+            console.error('❌ Container element not found');
             return;
         }
         
@@ -199,13 +203,16 @@ class ArticleManager {
             }
             
             if (articles.length === 0) {
+                console.log('📭 No articles to display, showing empty state');
                 container.innerHTML = this.getEmptyState();
                 return;
             }
             
+            console.log('✅ Generating HTML for', articles.length, 'articles');
             const articlesHTML = articles.map(article => this.generateArticleCard(article)).join('');
             container.innerHTML = articlesHTML;
             
+            console.log('🔗 Attaching event listeners to articles');
             // Add click event listeners
             this.attachEventListeners(container);
             

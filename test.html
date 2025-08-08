@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .article-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+        .loading-spinner { width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #333; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .error-state, .empty-state { text-align: center; padding: 20px; color: #666; }
+        .blog-meta { font-size: 0.9em; color: #666; margin-bottom: 10px; }
+        .tag { background: #333; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px; }
+        #console-output { background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 CMS Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output">Test starting...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>1. Configuration Test</h2>
+        <button onclick="testConfig()">Test CMS Config</button>
+        <div id="config-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Fallback Articles Test</h2>
+        <button onclick="testFallbackArticles()">Test Fallback Articles</button>
+        <div id="fallback-result" class="test-grid"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. API Test (Expected to Fail)</h2>
+        <button onclick="testAPIConnection()">Test Strapi API</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Article Rendering Test</h2>
+        <button onclick="testArticleRendering()">Test Article HTML Generation</button>
+        <div id="render-result" class="test-grid"></div>
+    </div>
+
+    <script>
+        // Capture console output
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function logToDisplay(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : 'ℹ️';
+            consoleOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToDisplay(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToDisplay(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToDisplay(args.join(' '), 'warn');
+        };
+    </script>
+
+    <script src="js/cms-api.js"></script>
+    
+    <script>
+        let strapiAPI, articleManager;
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Test page loaded');
+            
+            if (typeof CMS_CONFIG !== 'undefined') {
+                console.log('✅ CMS_CONFIG found');
+                strapiAPI = new StrapiAPI(CMS_CONFIG.strapiURL);
+                articleManager = new ArticleManager(strapiAPI);
+                console.log('✅ API and ArticleManager initialized');
+            } else {
+                console.error('❌ CMS_CONFIG not found');
+            }
+        });
+        
+        function testConfig() {
+            console.log('🔧 Testing configuration...');
+            const result = document.getElementById('config-result');
+            
+            if (typeof CMS_CONFIG !== 'undefined') {
+                result.innerHTML = `
+                    <h4>✅ Configuration Found</h4>
+                    <p><strong>Strapi URL:</strong> ${CMS_CONFIG.strapiURL}</p>
+                    <p><strong>Fallback Articles:</strong> ${CMS_CONFIG.fallbackArticles.length} articles</p>
+                    <p><strong>First Article Title:</strong> ${CMS_CONFIG.fallbackArticles[0]?.title || 'None'}</p>
+                `;
+            } else {
+                result.innerHTML = '<h4>❌ Configuration Not Found</h4>';
+            }
+        }
+        
+        function testFallbackArticles() {
+            console.log('📰 Testing fallback articles...');
+            const result = document.getElementById('fallback-result');
+            
+            if (CMS_CONFIG && CMS_CONFIG.fallbackArticles) {
+                console.log('Found', CMS_CONFIG.fallbackArticles.length, 'fallback articles');
+                articleManager.renderArticles(result, CMS_CONFIG.fallbackArticles);
+            } else {
+                result.innerHTML = '<div class="error-state">❌ No fallback articles found</div>';
+            }
+        }
+        
+        async function testAPIConnection() {
+            console.log('🌐 Testing API connection...');
+            const result = document.getElementById('api-result');
+            result.innerHTML = '<div class="loading-spinner"></div>';
+            
+            try {
+                const response = await strapiAPI.getArticles();
+                result.innerHTML = `
+                    <h4>✅ API Connected</h4>
+                    <p>Found ${response.data.length} articles</p>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h4>❌ API Connection Failed (Expected)</h4>
+                    <p>Error: ${error.message}</p>
+                    <p>This is normal if Strapi is not deployed yet.</p>
+                `;
+            }
+        }
+        
+        function testArticleRendering() {
+            console.log('🎨 Testing article rendering...');
+            const result = document.getElementById('render-result');
+            
+            // Test with a single sample article
+            const sampleArticle = {
+                id: 999,
+                title: 'Test Article Rendering',
+                slug: 'test-article',
+                excerpt: 'This is a test article to verify HTML generation works correctly.',
+                content: 'Full article content goes here...',
+                publishedAt: new Date().toISOString(),
+                featured: true,
+                tags: ['Test', 'HTML', 'Rendering'],
+                author: 'Test Author',
+                readTime: 2,
+                image: '/images/blog/spring-boot-placeholder.jpg'
+            };
+            
+            articleManager.renderArticles(result, [sampleArticle]);
+        }
+    </script>
+</body>
+</html>
