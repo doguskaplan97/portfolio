@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "WebFetch(domain:doguskaplan97.github.io)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
