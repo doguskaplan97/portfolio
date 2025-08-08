@@ -1,0 +1,440 @@
+/* Keyframe Animations */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0, 0, 0);
+    }
+    40%, 43% {
+        transform: translate3d(0, -8px, 0);
+    }
+    70% {
+        transform: translate3d(0, -4px, 0);
+    }
+    90% {
+        transform: translate3d(0, -2px, 0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+/* Scroll-triggered animations */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.animated {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hero Animations */
+.hero-content > * {
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero-image {
+    animation-delay: 0.2s;
+}
+
+.hero-title {
+    animation-delay: 0.4s;
+}
+
+.hero-subtitle {
+    animation-delay: 0.6s;
+}
+
+.typing-animation {
+    animation-delay: 0.8s;
+}
+
+.hero-buttons {
+    animation-delay: 1s;
+}
+
+/* Profile Image Animation */
+.profile-img {
+    animation: zoomIn 0.8s ease-out 0.2s both;
+    transition: transform 0.3s ease;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+}
+
+/* Navbar Scroll Animation */
+.navbar.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Button Hover Animations */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+/* Skill Bar Animations */
+.skill-progress {
+    position: relative;
+    overflow: hidden;
+}
+
+.skill-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0) 100%);
+    animation: shimmer 2s infinite;
+    transform: translateX(-100%);
+}
+
+.skill-item:hover .skill-progress::after {
+    animation: shimmer 1.5s infinite;
+}
+
+/* Timeline Animation */
+.timeline-item {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 0.6s ease-out;
+}
+
+.timeline-item.animated {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.timeline-item:nth-child(even) {
+    transform: translateX(50px);
+}
+
+.timeline-item:nth-child(even).animated {
+    transform: translateX(0);
+}
+
+.timeline-marker {
+    animation: pulse 2s infinite;
+}
+
+/* Project Card Animations */
+.project-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-card:hover .project-image img {
+    transform: scale(1.1);
+}
+
+.project-card:hover {
+    transform: translateY(-10px) rotateX(5deg);
+}
+
+/* Certification Item Animations */
+.cert-item {
+    transition: all 0.3s ease;
+}
+
+.cert-item:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.cert-icon {
+    transition: all 0.3s ease;
+}
+
+.cert-item:hover .cert-icon {
+    animation: bounce 1s ease;
+    color: var(--primary-color);
+}
+
+/* Blog Card Animations */
+.blog-card {
+    transition: all 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+}
+
+/* Contact Form Animations */
+.form-group input,
+.form-group textarea {
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    transform: translateY(-2px);
+}
+
+/* Loading Animations for Dynamic Content */
+.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Hamburger Menu Animation */
+.hamburger.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Scroll Progress Indicator */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    z-index: 9999;
+    transition: width 0.1s ease;
+}
+
+/* Section Reveal Animations */
+.section-reveal {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered Animation for Grid Items */
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-animation > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-animation > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Counter Animation */
+.stat-number {
+    overflow: hidden;
+    position: relative;
+}
+
+.stat-number.counting {
+    animation: pulse 0.1s ease-out;
+}
+
+/* Text Typing Effect */
+.typing-text {
+    border-right: 2px solid var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    animation: blink 1s infinite step-end;
+}
+
+/* Parallax Background Animation */
+.parallax-bg {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Icon Hover Animations */
+.icon-hover {
+    transition: all 0.3s ease;
+}
+
+.icon-hover:hover {
+    transform: rotateY(180deg);
+    color: var(--secondary-color);
+}
+
+/* Link Underline Animation */
+.link-underline {
+    position: relative;
+    text-decoration: none;
+}
+
+.link-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+    width: 100%;
+}
+
+/* Mobile-specific animations */
+@media (max-width: 768px) {
+    .hero-content > * {
+        animation-delay: 0s;
+        animation-duration: 0.8s;
+    }
+    
+    .timeline-item {
+        transform: translateY(30px);
+    }
+    
+    .timeline-item.animated {
+        transform: translateY(0);
+    }
+    
+    .timeline-item:nth-child(even) {
+        transform: translateY(30px);
+    }
+    
+    .timeline-item:nth-child(even).animated {
+        transform: translateY(0);
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .scroll-progress,
+    .parallax-bg {
+        transform: none !important;
+    }
+}
