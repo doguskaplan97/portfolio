@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Technical blog articles by Senior Java Software Engineer - Java, Spring Boot, DevOps, and Enterprise Architecture">
+    <meta name="keywords" content="Java Blog, Spring Boot, DevOps, Software Engineering, Microservices, Enterprise Architecture">
+    <title>Technical Blog - Senior Java Software Engineer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/blog.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">Portfolio</a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="index.html#about" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="index.html#skills" class="nav-link">Skills</a></li>
+                <li class="nav-item"><a href="index.html#experience" class="nav-link">Experience</a></li>
+                <li class="nav-item"><a href="index.html#projects" class="nav-link">Projects</a></li>
+                <li class="nav-item"><a href="blog.html" class="nav-link active">Blog</a></li>
+                <li class="nav-item"><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blog Header -->
+    <section class="blog-header">
+        <div class="container">
+            <div class="blog-header-content">
+                <h1 class="blog-title">Technical Blog</h1>
+                <p class="blog-subtitle">
+                    Sharing insights on Java development, DevOps practices, and enterprise architecture from 7 years of hands-on experience
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Controls -->
+    <section class="blog-controls">
+        <div class="container">
+            <div class="controls-wrapper">
+                <div class="search-container">
+                    <input type="text" id="article-search" placeholder="Search articles..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="filter-container">
+                    <select id="tag-filter" class="filter-select">
+                        <option value="">All Topics</option>
+                        <option value="Java">Java</option>
+                        <option value="Spring Boot">Spring Boot</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="Microservices">Microservices</option>
+                        <option value="Performance">Performance</option>
+                        <option value="Database">Database</option>
+                        <option value="Architecture">Architecture</option>
+                    </select>
+                </div>
+                <div class="sort-container">
+                    <select id="sort-select" class="sort-select">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Articles Grid -->
+    <section class="blog-content">
+        <div class="container">
+            <div id="articles-grid" class="articles-grid">
+                <!-- Articles will be loaded here via JavaScript -->
+            </div>
+            
+            <!-- Pagination -->
+            <div id="pagination" class="pagination-container">
+                <!-- Pagination will be loaded here via JavaScript -->
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-articles">
+                <div class="loading-spinner"></div>
+                <p>Loading articles...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <div class="newsletter-text">
+                    <h3>Stay Updated</h3>
+                    <p>Get notified about new articles on Java development, DevOps, and enterprise architecture.</p>
+                </div>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" class="newsletter-input" required>
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 Senior Java Software Engineer Portfolio. Built with passion for clean code.</p>
+                <div class="footer-links">
+                    <a href="index.html">Back to Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Article Modal (for detailed view) -->
+    <div id="article-modal" class="article-modal" style="display: none;">
+        <div class="article-modal-content">
+            <div class="article-modal-header">
+                <button class="article-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="article-content" class="article-full-content">
+                <!-- Article content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/cms-api.js"></script>
+    <script src="js/blog.js"></script>
+</body>
+</html>
