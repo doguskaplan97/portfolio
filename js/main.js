@@ -29,22 +29,28 @@ document.addEventListener('DOMContentLoaded', function() {
         // Smooth scroll for navigation links
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-                const targetSection = document.getElementById(targetId);
+                const href = this.getAttribute('href');
                 
-                if (targetSection) {
-                    const offsetTop = targetSection.offsetTop - 80;
-                    window.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
-                    });
+                // Only handle hash links (internal navigation), not external pages
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = href.substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    
+                    if (targetSection) {
+                        const offsetTop = targetSection.offsetTop - 80;
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
                 }
                 
-                // Close mobile menu if open
+                // Close mobile menu if open (for all navigation)
                 const navMenu = document.querySelector('.nav-menu');
-                navMenu.classList.remove('active');
-                document.querySelector('.hamburger').classList.remove('active');
+                const hamburger = document.querySelector('.hamburger');
+                if (navMenu) navMenu.classList.remove('active');
+                if (hamburger) hamburger.classList.remove('active');
             });
         });
         
@@ -473,31 +479,76 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // CMS Integration
     function initCMS() {
+        console.log('🚀 Initializing CMS integration...');
+        
+        // Check if CMS classes are available
+        if (typeof StrapiAPI === 'undefined') {
+            console.error('❌ StrapiAPI class not found - make sure cms-api.js is loaded');
+            return;
+        }
+        
         // Initialize Strapi API and Article Manager
         strapiAPI = new StrapiAPI(CMS_CONFIG.strapiURL);
         articleManager = new ArticleManager(strapiAPI);
         articleRouter = new ArticleRouter(articleManager);
         
+        console.log('✅ CMS classes initialized');
+        console.log('📡 Strapi URL:', CMS_CONFIG.strapiURL);
+        console.log('📝 Fallback articles available:', CMS_CONFIG.fallbackArticles.length);
+        
         // Load featured articles for homepage blog section
         const blogGrid = document.querySelector('#homepage-blog-grid');
         if (blogGrid) {
+            console.log('🎯 Found blog grid, loading articles...');
             loadFeaturedArticles(blogGrid);
+        } else {
+            console.warn('⚠️ Blog grid element not found');
         }
         
         // Add search functionality if search input exists
         const searchInput = document.querySelector('#article-search');
         if (searchInput) {
+            console.log('🔍 Search input found, initializing search...');
             initArticleSearch(searchInput);
         }
     }
     
     async function loadFeaturedArticles(container) {
+        console.log('📰 Loading featured articles...');
+        
         try {
-            await articleManager.renderFeaturedArticles(container, 3);
+            console.log('🌐 Attempting to fetch from Strapi API...');
+            const response = await strapiAPI.getFeaturedArticles(3);
+            const articles = response.data.map(article => articleManager.formatArticle(article));
+            
+            if (articles.length > 0) {
+                console.log('✅ Found', articles.length, 'featured articles from API');
+                articleManager.renderArticles(container, articles);
+            } else {
+                console.log('📋 No featured articles, trying latest articles...');
+                const latestResponse = await strapiAPI.getPaginatedArticles(1, 3);
+                const latestArticles = latestResponse.data.map(article => articleManager.formatArticle(article));
+                console.log('✅ Found', latestArticles.length, 'latest articles from API');
+                articleManager.renderArticles(container, latestArticles);
+            }
         } catch (error) {
-            console.log('Strapi API not available, using fallback articles');
-            // Use fallback articles for development
-            articleManager.renderArticles(container, CMS_CONFIG.fallbackArticles);
+            console.log('❌ Strapi API not available:', error.message);
+            console.log('🔄 Using fallback articles for development...');
+            console.log('📝 Fallback articles:', CMS_CONFIG.fallbackArticles);
+            
+            if (CMS_CONFIG.fallbackArticles && CMS_CONFIG.fallbackArticles.length > 0) {
+                console.log('✅ Rendering', CMS_CONFIG.fallbackArticles.length, 'fallback articles');
+                articleManager.renderArticles(container, CMS_CONFIG.fallbackArticles);
+            } else {
+                console.error('❌ No fallback articles available!');
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>No Articles Available</h3>
+                        <p>Please set up Strapi CMS or check fallback articles configuration.</p>
+                    </div>
+                `;
+            }
         }
     }
     
